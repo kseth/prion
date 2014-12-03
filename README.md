@@ -1,8 +1,6 @@
-Karthik Sethuraman
-------------------
+Mathematical Modeling of Prionaceous Infectious Particles
+=========================================================
 
-Mathematical Modeling of Prionaceous Particles
-----------------------------------------------
+### Karthik Sethuraman - Fall 2014 - BE 567
 
 Written in R and Java
-=====================
