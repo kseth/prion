@@ -12,7 +12,7 @@ class ComputationUtils {
 		maxR = 0;
 		int chosenPolymer = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet()) {
-			r = Math.random()*entry.getValue()*1.0/polymers;
+			r = Math.random()*entry.getValue()/polymers;
 			if(r > maxR) {
 				maxR = r;
 				chosenPolymer = entry.getKey();
@@ -27,7 +27,7 @@ class ComputationUtils {
 		maxR = 0;
 		int chosenPolymer = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet()) {
-			r = Math.random()*(entry.getValue())*(entry.getKey()-1)*1.0/polymerBonds;
+			r = Math.random()*(entry.getKey()-1.0)*entry.getValue()/polymerBonds;
 			if(r > maxR) {
 				maxR = r;
 				chosenPolymer = entry.getKey();
