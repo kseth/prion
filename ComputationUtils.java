@@ -257,6 +257,8 @@ class ComputationUtils {
 				}
 			}
 		}
+
+		return sampledValues;
 	}
 
 	public static int[][] prionGillespieInfectiousNonInfectious(double endTime, int numIterations, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, HashMap<Integer, Integer> polymerLengths0, int monomers0) {
