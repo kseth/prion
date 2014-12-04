@@ -12,10 +12,10 @@ class ComputationUtils {
 		maxR = 0;
 		int chosenPolymer = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet()) {
-			r = Math.random()*entry.value()*1.0/polymers;
+			r = Math.random()*entry.getValue()*1.0/polymers;
 			if(r > maxR) {
 				maxR = r;
-				chosenPolymer = entry.key();
+				chosenPolymer = entry.getKey();
 			}
 		}
 
@@ -27,12 +27,14 @@ class ComputationUtils {
 		maxR = 0;
 		int chosenPolymer = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet()) {
-			r = Math.random()*(entry.value())*(entry.key()-1)*1.0/polymerBonds;
+			r = Math.random()*(entry.getValue())*(entry.getKey()-1)*1.0/polymerBonds;
 			if(r > maxR) {
 				maxR = r;
-				chosenPolymer = entry.key();
+				chosenPolymer = entry.getKey();
 			}
 		}
+
+		return chosenPolymer;
 	}
 
 	public static HashMap<Integer, Integer> prionGillespiePolymerLengths(double endTime, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, HashMap<Integer, Integer> polymerLengths0, int monomers0) {
@@ -46,10 +48,10 @@ class ComputationUtils {
 		int monomers = monomers0;
 		int polymerSubunits = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet())
-			polymerSubunits+=entry.key()*entry.value();
+			polymerSubunits+=entry.getKey()*entry.getValue();
 		int polymerBonds = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet())
-			polymerBonds+=(entry.key()-1)*entry.value();
+			polymerBonds+=(entry.getKey()-1)*entry.getValue();
 
 
 		// variables to keep track of probabilities
@@ -144,7 +146,7 @@ class ComputationUtils {
 	}
 
 	public static int[][] prionGillespieInfectiousNoninfectious(double[] sampleTimes, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, HashMap<Integer, Integer> polymerLengths0, int monomers0) {
-		int[][] sampledValues = new int[sampleTimes.length][4];
+		int[][] sampledValues = new int[sampleTimes.length][3];
 		int counter = 0;
 		
 		// variables to keep track of state
@@ -156,10 +158,10 @@ class ComputationUtils {
 		int monomers = monomers0;
 		int polymerSubunits = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet())
-			polymerSubunits+=entry.key()*entry.value();
+			polymerSubunits+=entry.getKey()*entry.getValue();
 		int polymerBonds = 0;
 		for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet())
-			polymerBonds+=(entry.key()-1)*entry.value();
+			polymerBonds+=(entry.getKey()-1)*entry.getValue();
 
 
 		// variables to keep track of probabilities
@@ -183,13 +185,12 @@ class ComputationUtils {
 				sampledValues[counter][0] = monomers;
 				sampledValues[counter][1] = polymers;
 				sampledValues[counter][2] = polymerSubunits;
-				sampledValues[counter][3] = sampleTimes[counter];
 				counter++;
   			}
 
   			currentTime += waitTime;
 
-			if(currentTime < endTime) {
+			if(counter < sampleTimes.length) {
 				r1*=a;
 
 				if(r1 < aLambda) {
@@ -281,7 +282,7 @@ class ComputationUtils {
 
 			polymerLengths.clear();
 			for(Map.Entry<Integer, Integer> initialEntry: polymerLengths0.entrySet())
-				polymerLengths.put(initialEntry.key(), initialEntry.value());
+				polymerLengths.put(initialEntry.getKey(), initialEntry.getValue());
 
 			polymers = 0;
 			for(int i: polymerLengths.values())
@@ -289,11 +290,11 @@ class ComputationUtils {
 
 			polymerSubunits = 0;
 			for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet())
-				polymerSubunits+=entry.key()*entry.value();
+				polymerSubunits+=entry.getKey()*entry.getValue();
 			
 			polymerBonds = 0;
 			for(Map.Entry<Integer, Integer> entry: polymerLengths.entrySet())
-				polymerBonds+=(entry.key()-1)*entry.value();
+				polymerBonds+=(entry.getKey()-1)*entry.getValue();
 
 			monomers = monomers0;
 
