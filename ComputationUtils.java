@@ -6,6 +6,34 @@ class ComputationUtils {
 
 	}
 
+	private static class InnerHashMap {
+		private HashMap<Integer, Integer> hashMap;
+		
+		public InnerHashMap() {
+			this.hashMap = new HashMap<Integer, Integer>();
+		}
+
+		public InnerHashMap(HashMap<Integer, Integer> hashMap) {
+			this.hashMap = hashMap;
+		}
+
+		public HashMap<Integer, Integer> getHashMap() {
+			return hashMap;
+		}
+
+		public void put(int key, int value) {
+			hashMap.put(key, value);
+		}
+	}
+
+	public static InnerHashMap createEmptyInnerHashMap() {
+		return new InnerHashMap();
+	}
+
+	public static InnerHashMap createFilledInnerHashMap(HashMap<Integer, Integer> hashMap) {
+		return new InnerHashMap(hashMap);
+	}
+
 	private static int samplePolymerLength(HashMap<Integer, Integer> polymerLengths, int polymers) {
 		
 		double r, maxR;
@@ -37,11 +65,11 @@ class ComputationUtils {
 		return chosenPolymer;
 	}
 
-	public static HashMap<Integer, Integer> prionGillespiePolymerLengths(double endTime, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, HashMap<Integer, Integer> polymerLengths0, int monomers0) {
+	public static InnerHashMap prionGillespiePolymerLengths(double endTime, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, InnerHashMap polymerLengths0, int monomers0) {
 		
 		// variables to keep track of state
 		double currentTime = 0;
-		HashMap<Integer, Integer> polymerLengths = (HashMap<Integer, Integer>)(polymerLengths0.clone());
+		HashMap<Integer, Integer> polymerLengths = (HashMap<Integer, Integer>)(polymerLengths0.getHashMap().clone());
 		int polymers = 0;
 		for(int i: polymerLengths.values())
 			polymers+=i;
@@ -142,16 +170,16 @@ class ComputationUtils {
 			}
 		}
 
-		return polymerLengths;
+		return new InnerHashMap(polymerLengths);
 	}
 
-	public static int[][] prionGillespieInfectiousNoninfectious(double[] sampleTimes, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, HashMap<Integer, Integer> polymerLengths0, int monomers0) {
+	public static int[][] prionGillespieInfectiousNoninfectious(double[] sampleTimes, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, InnerHashMap polymerLengths0, int monomers0) {
 		int[][] sampledValues = new int[sampleTimes.length][3];
 		int counter = 0;
 		
 		// variables to keep track of state
 		double currentTime = 0;
-		HashMap<Integer, Integer> polymerLengths = (HashMap<Integer, Integer>)(polymerLengths0.clone());
+		HashMap<Integer, Integer> polymerLengths = (HashMap<Integer, Integer>)(polymerLengths0.getHashMap().clone());
 		int polymers = 0;
 		for(int i: polymerLengths.values())
 			polymers+=i;
@@ -262,7 +290,7 @@ class ComputationUtils {
 		return sampledValues;
 	}
 
-	public static int[][] prionGillespieInfectiousNonInfectious(double endTime, int numIterations, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, HashMap<Integer, Integer> polymerLengths0, int monomers0) {
+	public static int[][] prionGillespieInfectiousNonInfectious(double endTime, int numIterations, double lambda, double delta_m, double beta, double delta_p, double b, int polymerThreshold, InnerHashMap polymerLengths0, int monomers0) {
 		
 		int[][] sampledValues = new int[numIterations][3];
 
@@ -281,7 +309,7 @@ class ComputationUtils {
 			currentTime = 0;
 
 			polymerLengths.clear();
-			for(Map.Entry<Integer, Integer> initialEntry: polymerLengths0.entrySet())
+			for(Map.Entry<Integer, Integer> initialEntry: polymerLengths0.getHashMap().entrySet())
 				polymerLengths.put(initialEntry.getKey(), initialEntry.getValue());
 
 			polymers = 0;

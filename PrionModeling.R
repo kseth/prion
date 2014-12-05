@@ -1,50 +1,52 @@
-## model parameters
-## beta - vector of size M containing redispersion rates for each age levels
-## a - vector of size M containing age levels
-## alpha - rate of infection in attack zone
-## c - participation rate
-## p - prevalence of infection
-## mu - service rate
-single.server <- function(beta, a = 0:(length(beta)-1), alpha, c, p, mu, javaClass) {
-    treatedStats <- .jcall(javaClass,"[D","singleServer",.jarray(as.numeric(a)),.jarray(as.numeric(beta)), as.numeric(alpha), as.numeric(c), as.numeric(p), as.numeric(mu))
-    return(treatedStats)
-}
-
-prion.multiple.iterations <- function() {
-
-}
-
-prion.time.steps <- function() {
-
-}
-
-prion.polymer.distribution <- function(endTime, lambda, delta_m, beta, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0) {
-
+prion.multiple.iterations <- function(endTime, numIterations, lambda, delta_m, beta, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass) {
 	
+	polymerDistribution0_innerhm <- convert.integer.vectors.hm(polymerLengths0_size, polymerLengths0_count)
+	sampledValues <- computationClass$prionGillespieInfectiousNonInfectious(as.numeric(endTime), as.integer(numIterations), as.numeric(lambda), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
+
+
+	return(.jevalArray(sampledValues, simplify=TRUE))
 }
 
-convert.integer.vectors.hm <- function(keys, values) {
+prion.time.steps <- function(sampleTimes, lambda, delta_m, beta, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass) {
+
+	sampleTimes <- sort(sampleTimes)
+	polymerDistribution0_innerhm <- convert.integer.vectors.hm(polymerLengths0_size, polymerLengths0_count)
+	sampledValues <- computationClass$prionGillespieInfectiousNonInfectious(.jarray(as.numeric(sampleTimes)), as.numeric(lambda), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
+
+	return(.jevalArray(sampledValues, simplify=TRUE))
+}
+
+prion.polymer.distribution <- function(endTime, lambda, delta_m, beta, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass) {
+
+	polymerDistribution0_innerhm <- convert.integer.vectors.hm(polymerLengths0_size, polymerLengths0_count)
+	polymerDistributionFinal_innerhm <- computationClass$prionGillespiePolymerLengths(as.numeric(endTime), as.numeric(lambda), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
+
+	return(convert.integer.hm.vectors(polymerDistributionFinal_innerhm))
+}
+
+convert.integer.vectors.hm <- function(keys, values, computationClass) {
 	if(length(keys) != length(values))
 		stop("keys and values must have same length")
 
-	hm <- .jnew("java/util/HashMap<Integer, Integer>")
+	innerhm <- computationClass$createEmptyInnerHashMap()
 	for(i in 1:length(keys)){
-		.jcall(hm, "put", as.integer(keys[i]), as.integer(values[i]))
+		innerhm$put(as.integer(keys[i]), as.integer(values[i]))
 	}
 
-	return(hm)
+	return(innerhm)
 }
 
-convert.integer.hm.vectors <- function(hm) {
-	entrySet <- .jcall(hm, "entrySet")
-	iterator <-.jcall(entrySet,"iterator")
-	size <- .jcall(entrySet, "size")
+convert.integer.hm.vectors <- function(innerhm) {
+	hm <- J(innerhm, "getHashMap")
+	entrySet <- J(hm, "entrySet")
+	iterator <- J(entrySet, "iterator")
+	size <- J(entrySet, "size")
 	keys <- rep(0, size)
 	values <- rep(0, size)
 	for(index in 1:size) {
-		entry <- .jcall(iterator, "next")
-		keys[index] <- .jcall(entry, "getKey")
-		values[index] <- .jcall(entry, "getValue")
+		entry <- J(iterator, "next")
+		keys[index] <- J(entry, "getKey")
+		values[index] <- J(entry, "getValue")
 	}
 
 	return(list(keys=keys, values=values))
@@ -52,4 +54,10 @@ convert.integer.hm.vectors <- function(hm) {
 
 library("rJava")
 .jinit(".")
-computationClass <- .jnew("ComputationUtils")
+computationClass <- J("ComputationUtils")
+
+keys <- c(1, 2, 3, 4)
+values <- c(10, 20, 30, 40)
+innerhm <- convert.integer.vectors.hm(keys, values, computationClass)
+returnedSet <- convert.integer.hm.vectors(innerhm)
+print(returnedSet)
