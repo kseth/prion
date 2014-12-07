@@ -11,9 +11,38 @@ prionTimeSteps <- function(sampleTimes, lambda, delta_m, beta, delta_p, b, polym
 
 	sampleTimes <- sort(sampleTimes)
 	polymerDistribution0_innerhm <- convertIntegerVectorsHM(polymerLengths0_size, polymerLengths0_count, computationClass)
-	sampledValues <- computationClass$prionGillespieInfectiousNonInfectious(.jarray(as.numeric(sampleTimes)), as.numeric(lambda), as.numeric(delta_m), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
+	sampledValues <- computationClass$prionGillespieInfectiousNoninfectious(.jarray(as.numeric(sampleTimes)), as.numeric(lambda), as.numeric(delta_m), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
 
 	return(.jevalArray(sampledValues, simplify=TRUE))
+}
+
+prionTimeStepsMultipleIterations <- function(sampleTimes, numIterations, lambda, delta_m, beta, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass) {
+
+	sampleTimes <- sort(sampleTimes)
+	polymerDistribution0_innerhm <- convertIntegerVectorsHM(polymerLengths0_size, polymerLengths0_count, computationClass)
+	
+	sampledValues <- computationClass$prionGillespieInfectiousNoninfectious(.jarray(as.numeric(sampleTimes)), as.numeric(lambda), as.numeric(delta_m), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
+
+	currentTotal <- as.matrix(.jevalArray(sampledValues, simplify=TRUE))
+	currentTotal <- cbind(currentTotal, currentTotal[, 3]/apply(currentTotal[, c(1, 3)], 1, sum))
+	currentTotalSquared <- currentTotal * currentTotal
+
+	if(numIterations > 1) {	
+		for(iter in 2:numIterations) {
+			sampledValues <- computationClass$prionGillespieInfectiousNoninfectious(.jarray(as.numeric(sampleTimes)), as.numeric(lambda), as.numeric(delta_m), as.numeric(beta), as.numeric(delta_p), as.numeric(b), as.integer(polymerThreshold), polymerDistribution0_innerhm, as.integer(monomers0))
+
+			eval <- as.matrix(.jevalArray(sampledValues, simplify=TRUE))
+			eval <- cbind(eval, eval[, 3]/apply(eval[, c(1, 3)], 1, sum))
+			currentTotal <- currentTotal + eval
+			currentTotalSquared <- currentTotalSquared + eval * eval
+		}
+	}
+
+	overallMean <- currentTotal / numIterations
+	overallMeanSquare <- currentTotalSquared / numIterations
+	overallVariance <- overallMeanSquare - overallMean * overallMean
+
+	return(list(mean=overallMean, var=overallVariance, sd = sqrt(overallVariance)))
 }
 
 prionPolymerDistribution <- function(endTime, lambda, delta_m, beta, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass) {
