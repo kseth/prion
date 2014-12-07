@@ -209,7 +209,7 @@ class ComputationUtils {
 			a = aLambda + aDeltaM + aBeta + aDeltaP + aB;
 			waitTime = -1.0/(a*Math.log(r2));
 			
-			while(currentTime < sampleTimes[counter] && currentTime + waitTime >= sampleTimes[counter]) {
+			while(counter < sampleTimes.length && currentTime <= sampleTimes[counter] && currentTime + waitTime > sampleTimes[counter]) {
 				sampledValues[counter][0] = monomers;
 				sampledValues[counter][1] = polymers;
 				sampledValues[counter][2] = polymerSubunits;
