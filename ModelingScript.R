@@ -32,6 +32,7 @@ timeStepResultsBHigh <- prionTimeStepsMultipleIterations(timeSteps, 100, lambda,
 bLow <- 0.0001
 timeStepResultsBLow <- prionTimeStepsMultipleIterations(timeSteps, 100, lambda, delta_m, beta, delta_p, bLow, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass)
 
+## Figure 2
 dev.new()
 par(mfrow = c(3, 4))
 plotTimeStepsMultipleIterations(timeSteps, timeStepResults)
@@ -42,6 +43,22 @@ endTime <- 150
 numiterations <- 1000
 bThreshold <- 0.00001
 multipleIterationResultsBThreshold <- prionMultipleIterations(endTime, numiterations, lambda, delta_m, beta, delta_p, bThreshold, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass)
+
+## Figure 3
 dev.new()
 par(mfrow = c(3, 1))
 plotHistogramMultipleIterations(multipleIterationResultsBThreshold)
+
+timeSteps <- 1:1500/10
+numiterations <- 100
+delta_pHigh <- 0.4
+timeStepResultsPHigh <- prionTimeStepsMultipleIterations(timeSteps, 100, lambda, delta_m, beta, delta_pHigh, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass)
+
+betaLow <- 0.03
+timeStepResultsBetaLow <- prionTimeStepsMultipleIterations(timeSteps, 100, lambda, delta_m, betaLow, delta_p, b, polymerThreshold, polymerLengths0_size, polymerLengths0_count, monomers0, computationClass)
+
+## Figure 4
+dev.new()
+par(mfrow = c(3, 4))
+plotTimeStepsMultipleIterations(timeSteps, timeStepResultsPHigh)
+plotTimeStepsMultipleIterations(timeSteps, timeStepResultsBetaLow)
